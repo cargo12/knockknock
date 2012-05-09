@@ -16,7 +16,6 @@
 # USA
 #
 
-import string
 from struct import *
 
 
@@ -29,17 +28,18 @@ class LogEntry:
     def buildTokenMap(self, line):
         self.tokenMap = dict()
 
-        for token in line.split():
-            index = token.find("=");            
-            if index != -1:
-                exploded = token.split('=')
-                self.tokenMap[exploded[0]] = exploded[1]
+        if 'KNOCKKNOCK' in line:
+            for token in line.split():
+                index = token.find("=");
+                if index != -1:
+                    exploded = token.split('=')
+                    self.tokenMap[exploded[0]] = exploded[1]
 
     def getDestinationPort(self):
-        return int(self.tokenMap['DPT'])
+        return int(self.tokenMap.get('DPT', 0))
 
     def getEncryptedData(self):
         return pack('!HIIH', int(self.tokenMap['ID']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
-                    
+
     def getSourceIP(self):
         return self.tokenMap['SRC']

@@ -52,7 +52,7 @@ def getProfiles():
     homedir  = os.path.expanduser('~')
     profiles = Profiles(homedir + '/.knockknock/')
     profiles.resolveNames()
-    
+
     return profiles
 
 def checkPrivileges():
@@ -68,18 +68,18 @@ def checkProfiles():
         sys.exit(2)
 
 def main(argv):
-    
+
     if len(argv) != 1:
         usage()
-        
+
     checkPrivileges()
     checkProfiles()
 
-    profiles = getProfiles()        
-    server   = ProxyServer(int(argv[0]), profiles)
+    profiles = getProfiles()
+    ProxyServer(int(argv[0]), profiles)
 
     knockknock.daemonize.createDaemon()
-    
+
     asyncore.loop(use_poll=True)
 
 if __name__ == '__main__':

@@ -30,14 +30,14 @@ class Profiles:
 
     def getProfileForPort(self, port):
         for profile in self.profiles:
-            if (int(profile.getKnockPort()) == int(port)):
+            if int(profile.getKnockPort()) == int(port):
                 return profile
 
         return None
 
     def getProfileForName(self, name):
         for profile in self.profiles:
-            if (name == profile.getName()):
+            if name == profile.getName():
                 return profile
 
         return None
@@ -45,7 +45,7 @@ class Profiles:
     def getProfileForIP(self, ip):
         for profile in self.profiles:
             ips = profile.getIPAddrs()
-                        
+
             if ip in ips:
                 return profile
 
@@ -55,7 +55,7 @@ class Profiles:
         for profile in self.profiles:
             name                     = profile.getName()
             address, alias, addrlist = socket.gethostbyname_ex(name)
-            
+
             profile.setIPAddrs(addrlist)
 
     def isEmpty(self):

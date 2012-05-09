@@ -4,7 +4,7 @@ Configurable daemon behaviors:
 
    1.) The current working directory set to the "/" directory.
    2.) The current file creation mode mask set to 0.
-   3.) Close all open files (1024). 
+   3.) Close all open files (1024).
    4.) Redirect standard I/O streams to "/dev/null".
 
 A failed call to fork() now raises an exception.
@@ -21,14 +21,13 @@ __revision__  = "$Id$"
 __version__   = "0.2"
 
 import os               # Miscellaneous OS interfaces.
-import sys              # System-specific parameters and functions.
 
 UMASK   = 0
 WORKDIR = "/"
 MAXFD   = 1024
 
 # The standard I/O file descriptors are redirected to /dev/null by default.
-if (hasattr(os, "devnull")):
+if hasattr(os, "devnull"):
    REDIRECT_TO = os.devnull
 else:
    REDIRECT_TO = "/dev/null"
@@ -43,7 +42,7 @@ def createDaemon():
    except OSError, e:
       raise Exception, "%s [%d]" % (e.strerror, e.errno)
 
-   if (pid == 0):	# The first child.
+   if not pid:	# The first child.
       os.setsid()
 
       try:
@@ -51,7 +50,7 @@ def createDaemon():
       except OSError, e:
          raise Exception, "%s [%d]" % (e.strerror, e.errno)
 
-      if (pid == 0):	# The second child.
+      if not pid:	# The second child.
          os.chdir(WORKDIR)
          os.umask(UMASK)
       else:
@@ -63,7 +62,7 @@ def createDaemon():
 #   maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
 #   if (maxfd == resource.RLIM_INFINITY):
 #      maxfd = MAXFD
-  
+
    # Iterate through and close all file descriptors.
 #   for fd in range(0, maxfd):
 #      try:
@@ -75,4 +74,4 @@ def createDaemon():
    os.dup2(0, 1)			# standard output (1)
    os.dup2(0, 2)			# standard error (2)
 
-   return(0)
+   return 0

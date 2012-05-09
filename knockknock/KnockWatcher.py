@@ -33,18 +33,19 @@ class KnockWatcher:
         for line in self.logFile.tail():
             try:
                 logEntry = LogEntry(line)
-                profile  = self.profiles.getProfileForPort(logEntry.getDestinationPort())
+                d_port = logEntry.getDestinationPort()
+                if d_port:
+                    profile  = self.profiles.getProfileForPort(d_port)
 
-                if (profile != None):
-                    try:
-                        ciphertext = logEntry.getEncryptedData()
-                        port       = profile.decrypt(ciphertext, self.config.getWindow())
-                        sourceIP   = logEntry.getSourceIP()
-                    
-                        self.portOpener.open(sourceIP, port)
-                        syslog.syslog("Received authenticated port-knock for port " + str(port) + " from " + sourceIP)
-                    except MacFailedException:
-                        pass
+                    if profile is not None:
+                        try:
+                            ciphertext = logEntry.getEncryptedData()
+                            port       = profile.decrypt(ciphertext, self.config.getWindow())
+                            sourceIP   = logEntry.getSourceIP()
+
+                            self.portOpener.open(sourceIP, port)
+                            syslog.syslog("Received authenticated port-knock for port " + str(port) + " from " + sourceIP)
+                        except MacFailedException:
+                            pass
             except:
-#                print "Unexpected error:", sys.exc_info()
                 syslog.syslog("knocknock skipping unrecognized line.")

@@ -25,7 +25,6 @@ USA
 
 import os, sys, pwd, grp
 
-from knockknock.LogEntry import LogEntry
 from knockknock.LogFile import LogFile
 from knockknock.Profiles import Profiles
 from knockknock.PortOpener import PortOpener
@@ -35,16 +34,16 @@ from knockknock.KnockWatcher import KnockWatcher
 import knockknock.daemonize
 
 def checkPrivileges():
-    if (not os.geteuid() == 0):
+    if os.geteuid():
         print "Sorry, you have to run knockknock-daemon as root."
         sys.exit(3)
 
 def checkConfiguration():
-    if (not os.path.isdir('/etc/knockknock.d/')):
+    if not os.path.isdir('/etc/knockknock.d/'):
         print "/etc/knockknock.d/ does not exist.  You need to setup your profiles first.."
         sys.exit(3)
 
-    if (not os.path.isdir('/etc/knockknock.d/profiles/')):
+    if not os.path.isdir('/etc/knockknock.d/profiles/'):
         print "/etc/knockknock.d/profiles/ does not exist.  You need to setup your profiles first..."
         sys.exit(3)
 
@@ -62,7 +61,7 @@ def handleFirewall(input, config):
 
 def handleKnocks(output, profiles, config):
     dropPrivileges()
-    
+
     logFile      = LogFile('/var/log/kern.log')
     portOpener   = PortOpener(output, config.getDelay())
     knockWatcher = KnockWatcher(config, logFile, profiles, portOpener)
@@ -76,7 +75,7 @@ def main(argv):
     profiles   = Profiles('/etc/knockknock.d/profiles/')
     config     = DaemonConfiguration('/etc/knockknock.d/config')
 
-    if (profiles.isEmpty()):
+    if profiles.isEmpty():
         print 'WARNING: Running knockknock-daemon without any active profiles.'
 
     knockknock.daemonize.createDaemon()
@@ -90,6 +89,6 @@ def main(argv):
     else:
         os.close(output)
         handleFirewall(os.fdopen(input, 'r'), config)
-                
+
 if __name__ == '__main__':
     main(sys.argv[1:])

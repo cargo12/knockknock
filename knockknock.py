@@ -21,7 +21,7 @@ USA
 
 """
 
-import time, os, sys
+import os, sys
 import getopt
 import subprocess
 
@@ -31,35 +31,35 @@ from knockknock.Profile import Profile
 def usage():
     print "Usage: knockknock.py -p <portToOpen> <host>"
     sys.exit(2)
-    
+
 def parseArguments(argv):
     try:
         port       = 0
         host       = ""
         opts, args = getopt.getopt(argv, "h:p:")
-        
+
         for opt, arg in opts:
             if opt in ("-p"):
                 port = arg
             else:
                 usage()
-                
+
         if len(args) != 1:
             usage()
         else:
             host = args[0]
 
-    except getopt.GetoptError:           
-        usage()                          
+    except getopt.GetoptError:
+        usage()
 
     if port == 0 or host == "":
         usage()
 
-    return (port, host)
+    return port, host
 
 def getProfile(host):
     homedir = os.path.expanduser('~')
-    
+
     if not os.path.isdir(homedir + '/.knockknock/'):
         print "Error: you need to setup your profiles in " + homedir + '/.knockknock/'
         sys.exit(2)
@@ -71,9 +71,9 @@ def getProfile(host):
     return Profile(homedir + '/.knockknock/' + host)
 
 def verifyPermissions():
-    if os.getuid() != 0:
+    if os.getuid():
         print 'Sorry, you must be root to run this.'
-        sys.exit(2)    
+        sys.exit(2)
 
 def existsInPath(command):
     def isExe(fpath):
@@ -89,12 +89,12 @@ def existsInPath(command):
 def main(argv):
     (port, host) = parseArguments(argv)
     verifyPermissions()
-    
+
     profile      = getProfile(host)
     port         = pack('!H', int(port))
     packetData   = profile.encrypt(port)
     knockPort    = profile.getKnockPort()
-    
+
     (idField, seqField, ackField, winField) = unpack('!HIIH', packetData)
 
     hping = existsInPath("hping3")
@@ -110,7 +110,7 @@ def main(argv):
                "-M", str(seqField),
                "-L", str(ackField),
                host]
-    
+
     try:
         subprocess.call(command, shell=False, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
         print 'Knock sent.'

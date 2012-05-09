@@ -16,11 +16,10 @@
 # USA
 #
 
-import os, string
+import os
 import ConfigParser
 import binascii
 import stat
-from struct import *
 
 from CryptoEngine import CryptoEngine
 
@@ -31,7 +30,7 @@ class Profile:
         self.directory    = directory
         self.name         = directory.rstrip('/').split('/')[-1]
 
-        if (cipherKey == None):
+        if cipherKey is None:
             self.deserialize()
         else:
             self.cipherKey = cipherKey
@@ -59,7 +58,7 @@ class Profile:
         return self.ipAddressList
 
     def setIPAddrs(self, ipAddressList):
-        self.ipAddressList = ipAddressList        
+        self.ipAddressList = ipAddressList
 
     def getName(self):
         return self.name
@@ -91,7 +90,7 @@ class Profile:
 
     def loadCounter(self):
         # Privsep bullshit...
-        if (self.counterFile == None):
+        if self.counterFile is None:
             self.counterFile = open(self.directory + "/counter", 'r+')
 
         counter = self.counterFile.readline()
@@ -102,17 +101,17 @@ class Profile:
     def loadConfig(self):
         config = ConfigParser.SafeConfigParser()
         config.read(self.directory + "/config")
-        
+
         return config.get('main', 'knock_port')
 
     def loadKey(self, keyFile):
         file = open(keyFile, 'r')
-        key  = binascii.a2b_base64(file.readline())        
+        key  = binascii.a2b_base64(file.readline())
 
         file.close()
         return key
 
-    def storeCipherKey(self):        
+    def storeCipherKey(self):
         self.storeKey(self.cipherKey, self.directory + "/cipher.key")
 
     def storeMacKey(self):
@@ -120,7 +119,7 @@ class Profile:
 
     def storeCounter(self):
         # Privsep bullshit...
-        if (self.counterFile == None):
+        if self.counterFile is None:
             self.counterFile = open(self.directory + '/counter', 'w')
             self.setPermissions(self.directory + '/counter')
 
@@ -156,5 +155,5 @@ class Profile:
     def printHex(self, val):
         for c in val:
             print "%#x" % ord(c),
-            
+
         print ""

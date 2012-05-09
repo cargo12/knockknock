@@ -16,7 +16,7 @@
 # USA
 #
 
-import os, hmac, hashlib
+import hmac, hashlib
 from MacFailedException import MacFailedException
 from Crypto.Cipher import AES
 from struct import *
@@ -38,7 +38,7 @@ class CryptoEngine:
     def verifyMac(self, port, remoteMac):
         localMac = self.calculateMac(port)
 
-        if (localMac != remoteMac):
+        if localMac != remoteMac:
             raise MacFailedException, "MAC Doesn't Match!"
 
     def encryptCounter(self, counter):
@@ -48,10 +48,10 @@ class CryptoEngine:
     def encrypt(self, plaintextData):
         plaintextData += self.calculateMac(plaintextData)
         counterCrypt   = self.encryptCounter(self.counter)
-        self.counter   = self.counter + 1
+        self.counter += 1
         encrypted      = str()
 
-        for i in range((len(plaintextData))):
+        for i in range(len(plaintextData)):
             encrypted += chr(ord(plaintextData[i]) ^ ord(counterCrypt[i]))
 
         self.profile.setCounter(self.counter)
@@ -64,13 +64,13 @@ class CryptoEngine:
             try:
                 counterCrypt = self.encryptCounter(self.counter + x)
                 decrypted    = str()
-                
+
                 for i in range((len(encryptedData))):
                     decrypted += chr(ord(encryptedData[i]) ^ ord(counterCrypt[i]))
-                    
+
                 port = decrypted[:2]
                 mac  = decrypted[2:]
-                    
+
                 self.verifyMac(port, mac)
                 self.counter += x + 1
 
